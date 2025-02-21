@@ -2,6 +2,7 @@ package csci2020u.assignment01;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.text.DecimalFormat;
 
 public class SpamDetector {
 
@@ -117,6 +118,58 @@ public class SpamDetector {
             p_WordGivenHam.put(word, probHam);
         }
     }
+    public double classifyEmail(String[] words){
+        double spamLogProbability = Math.log((double) totalSpamEmails/(totalSpamEmails + totalHamEmails));
+        double hamLogProbability = Math.log((double) totalHamEmails/ (totalSpamEmails + totalHamEmails));
+
+        for (String word : words){
+            if (p_WordGivenSpam.containsKey(word)){
+                spamLogProbability += Math.log(p_WordGivenSpam.get(word));
+            }
+            if(p_WordGivenHam.containsKey(word)){
+                hamLogProbability += Math.log(p_WordGivenHam.get(word));
+            }
+        }
+        double spamProbability = Math.exp(spamLogProbability)/(Math.exp(spamLogProbability)+ Math.exp(hamLogProbability));
+        return spamProbability;
+    }
+
+    public void evaluateClassifier(TestFile[] testFiles){
+        int truePositives =0;
+        int falsePositives =0;
+        int trueNegatives =0;
+        int falseNegatives =0;
+        for (TestFile testFile : testFiles){
+            String[] words = testFile.getFilename().toLowerCase().split(" ");
+            double spamProbability = classifyEmail(words);
+            String predictedClass = (spamProbability > 0.5) ? "spam" : "ham";
+
+            if (predictedClass.equals("spam") && testFile.getActualClass().equals("spam")) {
+                truePositives++;
+            } else if (predictedClass.equals("spam") && testFile.getActualClass().equals("ham")) {
+                falsePositives++;
+
+            } else if (predictedClass.equals("ham") && testFile.getActualClass().equals("ham")) {
+                trueNegatives++;
+
+            } else if (predictedClass.equals("ham") && testFile.getActualClass().equals("spam") ) {
+                falseNegatives++;
+
+            }
+        }
+        double accuracy = (double)(truePositives+trueNegatives)/ testFiles.length;
+        double precision = (double)truePositives/(truePositives + falsePositives);
+        double recall = (double) truePositives / (truePositives + falseNegatives);
+        double f1Score = 2*(precision * recall)/ (precision + recall);
+
+        System.out.println("Accuracy:" + accuracy);
+        System.out.println("Precision:" + precision);
+        System.out.println("Recall:" + recall);
+        System.out.println("F1 Score:" + f1Score);
+
+
+    }
+
 
     public Map<String, Double> getP_WordGivenHam()
     {
@@ -138,6 +191,7 @@ public class SpamDetector {
             ob.parseTrainingData(ham_folder, false  );
             ob.parseTrainingData(spam_folder, true);
 
+
             System.out.println("Ham Frequencies: "+ob.getTrainHamFreq());
             System.out.println("Spam Frequencies: "+ob.getTrainSpamFreq());
 
@@ -146,6 +200,13 @@ public class SpamDetector {
 
             System.out.println("Calculated Probabilities ( P(word|ham) ): "+ob.getP_WordGivenHam());
             System.out.println("Calculated Probabilities ( P(word|spam) ): "+ob.getP_WordGivenSpam());
+
+            TestFile[] testFiles = {
+                    new TestFile("free win" , 0.0, "spam"),
+                    new TestFile("hello world", 0.0 , "ham")
+            };
+
+            ob.evaluateClassifier(testFiles);
 
         }
         catch (IOException e)

@@ -118,6 +118,7 @@ public class SpamDetector {
             p_WordGivenHam.put(word, probHam);
         }
     }
+    // Classify a test email
     public double classifyEmail(String[] words){
         double spamLogProbability = Math.log((double) totalSpamEmails/(totalSpamEmails + totalHamEmails));
         double hamLogProbability = Math.log((double) totalHamEmails/ (totalSpamEmails + totalHamEmails));
@@ -133,7 +134,7 @@ public class SpamDetector {
         double spamProbability = Math.exp(spamLogProbability)/(Math.exp(spamLogProbability)+ Math.exp(hamLogProbability));
         return spamProbability;
     }
-
+    // Evaluate the classifier on test data
     public void evaluateClassifier(TestFile[] testFiles){
         int truePositives =0;
         int falsePositives =0;
@@ -205,7 +206,7 @@ public class SpamDetector {
                     new TestFile("free win" , 0.0, "spam"),
                     new TestFile("hello world", 0.0 , "ham")
             };
-
+            // Evaluate classifier
             ob.evaluateClassifier(testFiles);
 
         }

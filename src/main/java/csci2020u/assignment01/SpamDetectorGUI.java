@@ -1,61 +1,142 @@
 package csci2020u.assignment01;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Scanner;
 
+public class SpamDetectorGUI extends JFrame {
 
-public class SpamDetectorGUI {
-    public static void main(String[] args) {
-        // TODO: Put your Java Swing components here and you will use SpamDetector.java here
-        //Make JFrame
-        JFrame frame = new JFrame("Spam Detector");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new FlowLayout(FlowLayout.CENTER));
-        frame.setSize(500, 500);
+    private final JTable resultTable;
+    private final JLabel accuracyLabel, precisionLabel, recallLabel, f1ScoreLabel;
+    private final SpamDetector detector;
 
+    private int truePositives, falsePositives, trueNegatives, falseNegatives;
 
-        // Create a button to trigger folder selection
-        JButton selectFolderButton = new JButton("Select A Folder");
-        selectFolderButton.setBounds(50, 50, 120, 50);
+    public SpamDetectorGUI() {
+        setTitle("Spam Detector");
+        setSize(900, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
+        detector = new SpamDetector();  // Initialize SpamDetector
 
-        // Add an action listener to handle the directory selection and training
-        selectFolderButton.addActionListener(e -> {
-            // Create a JFileChooser to ask the user to choose a directory
-            JFileChooser directoryChooser = new JFileChooser();
-            directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            directoryChooser.setCurrentDirectory(new File("."));
+        JButton selectDirectoryButton = new JButton("Select Directory");
+        selectDirectoryButton.addActionListener(e -> chooseDirectory());
 
-            // Show the file chooser dialog
-            int returnValue = directoryChooser.showOpenDialog(frame);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                // Get the selected directory
-                File mainDirectory = directoryChooser.getSelectedFile();
-                System.out.println("Selected folder: " + mainDirectory.getAbsolutePath());
+        accuracyLabel = new JLabel("Accuracy: N/A");
+        precisionLabel = new JLabel("Precision: N/A");
+        recallLabel = new JLabel("Recall: N/A");
+        f1ScoreLabel = new JLabel("F1 Score: N/A");
 
-                try {
-                    SpamDetector spamDetector = new SpamDetector();
-                    spamDetector.parseTrainingData(new File(mainDirectory, "train/ham"), false);
-                    spamDetector.parseTrainingData(new File(mainDirectory, "train/spam"), true);
-                    spamDetector.parseTrainingData(new File(mainDirectory, "test/ham"), false);
-                    spamDetector.parseTrainingData(new File(mainDirectory, "test/spam"), true);
-                    spamDetector.calculateProbabilities();
-                    System.out.println("Training complete. Probabilities calculated.");
+        resultTable = new JTable(new DefaultTableModel(new String[]{"Filename", "Predicted", "Actual"}, 0));
+        JScrollPane tableScrollPane = new JScrollPane(resultTable);
 
+        JPanel topPanel = new JPanel(new FlowLayout());
+        topPanel.add(selectDirectoryButton);
 
+        JPanel statsPanel = new JPanel(new GridLayout(2, 2));
+        statsPanel.add(accuracyLabel);
+        statsPanel.add(precisionLabel);
+        statsPanel.add(recallLabel);
+        statsPanel.add(f1ScoreLabel);
 
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+        add(topPanel, BorderLayout.NORTH);
+        add(tableScrollPane, BorderLayout.CENTER);
+        add(statsPanel, BorderLayout.SOUTH);
+    }
 
+    private void chooseDirectory() {
+        JFileChooser directoryChooser = new JFileChooser();
+        directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        directoryChooser.setCurrentDirectory(new File("."));
+
+        if (directoryChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            runTrainingAndTesting(directoryChooser.getSelectedFile());
+        }
+    }
+
+    private void runTrainingAndTesting(File mainDirectory) {
+        try {
+            File trainHam = new File(mainDirectory, "main/resources/data/train/ham");
+            File trainHam2 = new File(mainDirectory, "main/resources/data/train/ham2");
+            File trainSpam = new File(mainDirectory, "main/resources/data/train/spam");
+            File testHam = new File(mainDirectory, "main/resources/data/test/ham");
+            File testSpam = new File(mainDirectory, "main/resources/data/test/spam");
+
+            if ((!trainHam.exists() && !trainHam2.exists()) || !trainSpam.exists() || !testHam.exists() || !testSpam.exists()) {
+                JOptionPane.showMessageDialog(this, "Ensure 'train/ham', 'train/ham2', 'train/spam', 'test/ham', and 'test/spam' folders exist.");
+                return;
             }
-        });
-        frame.add(selectFolderButton);
 
-        frame.setVisible(true);
+            resetMetrics();
+
+            if (trainHam.exists()) detector.parseTrainingData(trainHam, false);
+            if (trainHam2.exists()) detector.parseTrainingData(trainHam2, false);
+            detector.parseTrainingData(trainSpam, true);
+            detector.calculateProbabilities();
+            System.out.println("Total training files processed: " + detector.getNumFilesProcessed());
+
+
+            DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
+            model.setRowCount(0);  // Clear previous results
+
+            int totalFiles = processTestFiles(testSpam, "spam", model) + processTestFiles(testHam, "ham", model);
+
+            calculateAndDisplayMetrics(totalFiles);
+
+            JOptionPane.showMessageDialog(this, "Training and testing completed.\nFiles processed: " + totalFiles);
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }
+
+    private int processTestFiles(File testFolder, String actualClass, DefaultTableModel model) throws IOException {
+        int filesProcessed = 0;
+
+        for (File file : testFolder.listFiles()) {
+            if (!file.isFile()) continue;
+
+            Scanner scanner = new Scanner(file);
+            StringBuilder emailContent = new StringBuilder();
+            while (scanner.hasNext()) emailContent.append(scanner.next().toLowerCase()).append(" ");
+            scanner.close();
+
+            String[] words = emailContent.toString().trim().split("\\W+");
+            String predictedClass = detector.classifyEmail(words) > 0.5 ? "spam" : "ham";
+
+            if (predictedClass.equals("spam") && actualClass.equals("spam")) truePositives++;
+            else if (predictedClass.equals("spam") && actualClass.equals("ham")) falsePositives++;
+            else if (predictedClass.equals("ham") && actualClass.equals("ham")) trueNegatives++;
+            else if (predictedClass.equals("ham") && actualClass.equals("spam")) falseNegatives++;
+
+            model.addRow(new Object[]{file.getName(), predictedClass, actualClass});
+            filesProcessed++;
+        }
+
+        return filesProcessed;
+    }
+
+    private void calculateAndDisplayMetrics(int totalFiles) {
+        double accuracy = (double) (truePositives + trueNegatives) / totalFiles;
+        double precision = (truePositives + falsePositives) > 0 ? (double) truePositives / (truePositives + falsePositives) : 0;
+        double recall = (truePositives + falseNegatives) > 0 ? (double) truePositives / (truePositives + falseNegatives) : 0;
+        double f1Score = (precision + recall) > 0 ? 2 * (precision * recall) / (precision + recall) : 0;
+
+        accuracyLabel.setText("Accuracy: " + String.format("%.2f", accuracy * 100) + "%");
+        precisionLabel.setText("Precision: " + String.format("%.2f", precision * 100) + "%");
+        recallLabel.setText("Recall: " + String.format("%.2f", recall * 100) + "%");
+        f1ScoreLabel.setText("F1 Score: " + String.format("%.2f", f1Score * 100) + "%");
+    }
+
+    private void resetMetrics() {
+        truePositives = falsePositives = trueNegatives = falseNegatives = 0;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new SpamDetectorGUI().setVisible(true));
     }
 }

@@ -7,18 +7,21 @@ import java.text.DecimalFormat;
 public class SpamDetector {
 
     // This map stores word frequencies from ham emails.
-    private Map<String, Integer> trainHamFreq;
+    private final Map<String, Integer> trainHamFreq;
 
     // This map stores word frequencies from spam emails.
-    private Map<String, Integer> trainSpamFreq;
+    private final Map<String, Integer> trainSpamFreq;
 
     //Probability Maps: store calculated probabilities for words given spam or ham.
-    private Map<String, Double> p_WordGivenHam;
-    private Map<String, Double> p_WordGivenSpam;
+    private final Map<String, Double> p_WordGivenHam;
+    private final Map<String, Double> p_WordGivenSpam;
 
     //Counts for total spam and ham emails processed during training
     private int totalSpamEmails;
     private int totalHamEmails;
+
+    private int numFilesProcessed = 0;  // Tracks how many files were processed in training
+
 
     public SpamDetector() {
         // Constructor
@@ -45,6 +48,8 @@ public class SpamDetector {
         }
         //Process individual email file
         else {
+            numFilesProcessed++;  //  Increment files processed during training
+            System.out.println("Training on file: " + folder.getAbsolutePath());
 
             //to count the number of spam and ham emails
             if (isSpam) totalSpamEmails++; else totalHamEmails++;
@@ -214,6 +219,10 @@ public class SpamDetector {
         {
             e.printStackTrace();
         }
+    }
+
+    public int getNumFilesProcessed() {
+        return numFilesProcessed;
     }
 }
 

@@ -220,14 +220,10 @@ public class SpamDetector {
             e.printStackTrace();
         }
     }
-<<<<<<< HEAD
-=======
 
-    public int getNumFilesProcessed() {
-        return numFilesProcessed;
-    }
-}
->>>>>>> 7abd53f97d140ec880a31ef8d069177fd05e9513
+
+
+
 
     public int getNumFilesProcessed() {
         return numFilesProcessed;

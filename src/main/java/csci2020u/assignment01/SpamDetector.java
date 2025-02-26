@@ -7,18 +7,21 @@ import java.text.DecimalFormat;
 public class SpamDetector {
 
     // This map stores word frequencies from ham emails.
-    private Map<String, Integer> trainHamFreq;
+    private final Map<String, Integer> trainHamFreq;
 
     // This map stores word frequencies from spam emails.
-    private Map<String, Integer> trainSpamFreq;
+    private final Map<String, Integer> trainSpamFreq;
 
     //Probability Maps: store calculated probabilities for words given spam or ham.
-    private Map<String, Double> p_WordGivenHam;
-    private Map<String, Double> p_WordGivenSpam;
+    private final Map<String, Double> p_WordGivenHam;
+    private final Map<String, Double> p_WordGivenSpam;
 
     //Counts for total spam and ham emails processed during training
     private int totalSpamEmails;
     private int totalHamEmails;
+
+    private int numFilesProcessed = 0;  // Tracks how many files were processed in training
+
 
     public SpamDetector() {
         // Constructor
@@ -45,6 +48,8 @@ public class SpamDetector {
         }
         //Process individual email file
         else {
+            numFilesProcessed++;  //  Increment files processed during training
+            System.out.println("Training on file: " + folder.getAbsolutePath());
 
             //to count the number of spam and ham emails
             if (isSpam) totalSpamEmails++; else totalHamEmails++;
@@ -118,6 +123,7 @@ public class SpamDetector {
             p_WordGivenHam.put(word, probHam);
         }
     }
+    // Classify a test email
     public double classifyEmail(String[] words){
         double spamLogProbability = Math.log((double) totalSpamEmails/(totalSpamEmails + totalHamEmails));
         double hamLogProbability = Math.log((double) totalHamEmails/ (totalSpamEmails + totalHamEmails));
@@ -133,7 +139,7 @@ public class SpamDetector {
         double spamProbability = Math.exp(spamLogProbability)/(Math.exp(spamLogProbability)+ Math.exp(hamLogProbability));
         return spamProbability;
     }
-
+    // Evaluate the classifier on test data
     public void evaluateClassifier(TestFile[] testFiles){
         int truePositives =0;
         int falsePositives =0;
@@ -205,7 +211,7 @@ public class SpamDetector {
                     new TestFile("free win" , 0.0, "spam"),
                     new TestFile("hello world", 0.0 , "ham")
             };
-
+            // Evaluate classifier
             ob.evaluateClassifier(testFiles);
 
         }
@@ -214,5 +220,8 @@ public class SpamDetector {
             e.printStackTrace();
         }
     }
-}
 
+    public int getNumFilesProcessed() {
+        return numFilesProcessed;
+    }
+}

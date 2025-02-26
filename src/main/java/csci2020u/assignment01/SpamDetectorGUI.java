@@ -83,7 +83,8 @@ public class SpamDetectorGUI extends JFrame {
         };
         backgroundPanel.setLayout(new BorderLayout());
 
-        JPanel statsAndStatusPanel = new JPanel(new GridLayout(2,1));
+
+        JPanel statsAndStatusPanel = new JPanel(new GridLayout(2, 1));
         statsAndStatusPanel.setOpaque(false); // Make the panel transparent
 
         // Add the stats panel to the first row
@@ -95,10 +96,12 @@ public class SpamDetectorGUI extends JFrame {
         statusBar.setPreferredSize(new Dimension(getWidth(), 20)); // Set preferred height
         statsAndStatusPanel.add(statusBar);
 
+
         // Add components to the background panel
         backgroundPanel.add(topPanel, BorderLayout.NORTH);
         backgroundPanel.add(tableScrollPane, BorderLayout.CENTER);
         backgroundPanel.add(statsPanel, BorderLayout.SOUTH);
+
 
         // Add the background panel to the frame
         add(backgroundPanel, BorderLayout.CENTER);
@@ -196,3 +199,4 @@ public class SpamDetectorGUI extends JFrame {
         SwingUtilities.invokeLater(() -> new SpamDetectorGUI().setVisible(true));
     }
 }
+

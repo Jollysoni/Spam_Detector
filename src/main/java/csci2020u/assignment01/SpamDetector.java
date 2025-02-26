@@ -225,7 +225,11 @@ public class SpamDetector {
 
 
 
+
     public int getNumFilesProcessed() {
         return numFilesProcessed;
     }
 }
+
+
+

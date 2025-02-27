@@ -2,6 +2,7 @@ package csci2020u.assignment01;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
@@ -52,8 +53,10 @@ public class SpamDetectorGUI extends JFrame {
         f1ScoreLabel = new JLabel("F1 Score: N/A");
 
         // Create the table and scroll pane
-        resultTable = new JTable(new DefaultTableModel(new String[]{"Filename", "Predicted", "Actual"}, 0));
+        resultTable = new JTable(new DefaultTableModel(new String[]{"Filename", "Predicted", "Actual", "Correct"}, 0));
         JScrollPane tableScrollPane = new JScrollPane(resultTable);
+
+        resultTable.getColumn("Correct").setCellRenderer(new CorrectColumnRenderer());
 
         // Create the top panel with the button
         JPanel topPanel = new JPanel(new FlowLayout());
@@ -84,23 +87,23 @@ public class SpamDetectorGUI extends JFrame {
         backgroundPanel.setLayout(new BorderLayout());
 
 
-        JPanel statsAndStatusPanel = new JPanel(new GridLayout(2, 1));
+        JPanel statsAndStatusPanel = new JPanel(new BorderLayout());
         statsAndStatusPanel.setOpaque(false); // Make the panel transparent
 
         // Add the stats panel to the first row
-        statsAndStatusPanel.add(statsPanel);
+        statsAndStatusPanel.add(statsPanel, BorderLayout.NORTH);
 
         // Add the status bar to the second row
         statusBar = new JLabel("Ready");
         statusBar.setBorder(BorderFactory.createEtchedBorder()); // Add a border for better visibility
         statusBar.setPreferredSize(new Dimension(getWidth(), 20)); // Set preferred height
-        statsAndStatusPanel.add(statusBar);
+        statsAndStatusPanel.add(statusBar, BorderLayout.SOUTH);
 
 
         // Add components to the background panel
         backgroundPanel.add(topPanel, BorderLayout.NORTH);
         backgroundPanel.add(tableScrollPane, BorderLayout.CENTER);
-        backgroundPanel.add(statsPanel, BorderLayout.SOUTH);
+        backgroundPanel.add(statsAndStatusPanel, BorderLayout.SOUTH);
 
 
         // Add the background panel to the frame
@@ -172,7 +175,8 @@ public class SpamDetectorGUI extends JFrame {
             else if (predictedClass.equals("ham") && actualClass.equals("ham")) trueNegatives++;
             else if (predictedClass.equals("ham") && actualClass.equals("spam")) falseNegatives++;
 
-            model.addRow(new Object[]{file.getName(), predictedClass, actualClass});
+            String correctnessSymbol = predictedClass.equals(actualClass) ? "✓" : "✗";
+            model.addRow(new Object[]{file.getName(), predictedClass, actualClass, correctnessSymbol});
             filesProcessed++;
         }
 
@@ -196,7 +200,55 @@ public class SpamDetectorGUI extends JFrame {
     }
 
     public static void main(String[] args) {
+
         SwingUtilities.invokeLater(() -> new SpamDetectorGUI().setVisible(true));
     }
+
+    private static class CorrectColumnRenderer extends DefaultTableCellRenderer{
+        private final Icon tickIcon;
+        private final Icon crossIcon;
+
+        public CorrectColumnRenderer(){
+            ImageIcon tick = new ImageIcon("src/main/resources/icons/greentick.png");
+            ImageIcon cross = new ImageIcon("src/main/resources/icons/crossicon.png");
+
+            int iconWidth =16;
+            int iconHeight=16;
+
+            tickIcon = new ImageIcon(tick.getImage().getScaledInstance(iconWidth,iconHeight,Image.SCALE_SMOOTH));
+            crossIcon = new ImageIcon(cross.getImage().getScaledInstance(iconWidth,iconHeight,Image.SCALE_SMOOTH));
+
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column){
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value,isSelected, hasFocus, row , column);
+
+            if (value!=null){
+                String correctnessSymbol = value.toString();
+                if(correctnessSymbol.equals("✓")){
+                    label.setIcon(tickIcon);
+                    label.setText("");
+                } else if (correctnessSymbol.equals("✗")) {
+                    label.setIcon(crossIcon);
+                    label.setText("");// Clear text
+                    
+                }else{
+                    label.setIcon(null);
+                    label.setText("");
+                }
+            }else{
+                label.setIcon(null);
+                label.setText("");
+            }
+            label.setHorizontalAlignment(JLabel.CENTER);
+
+            return label;
+        }
+    }
+
+
 }
+
+
 

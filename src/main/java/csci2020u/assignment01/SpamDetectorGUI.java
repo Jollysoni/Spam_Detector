@@ -122,11 +122,11 @@ public class SpamDetectorGUI extends JFrame {
 
     private void runTrainingAndTesting(File mainDirectory) {
         try {
-            File trainHam = new File(mainDirectory, "src/main/resources/data/train/ham");
-            File trainHam2 = new File(mainDirectory, "src/main/resources/data/train/ham2");
-            File trainSpam = new File(mainDirectory, "src/main/resources/data/train/spam");
-            File testHam = new File(mainDirectory, "src/main/resources/data/test/ham");
-            File testSpam = new File(mainDirectory, "src/main/resources/data/test/spam");
+            File trainHam = new File(mainDirectory, "train/ham");
+            File trainHam2 = new File(mainDirectory, "train/ham2");
+            File trainSpam = new File(mainDirectory, "train/spam");
+            File testHam = new File(mainDirectory, "test/ham");
+            File testSpam = new File(mainDirectory, "test/spam");
 
             if ((!trainHam.exists() && !trainHam2.exists()) || !trainSpam.exists() || !testHam.exists() || !testSpam.exists()) {
                 JOptionPane.showMessageDialog(this, "Ensure 'train/ham', 'train/ham2', 'train/spam', 'test/ham', and 'test/spam' folders exist.");

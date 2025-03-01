@@ -1,16 +1,26 @@
 package csci2020u.assignment01;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.io.*;
 
-public class SpamDetectorGUI {
+public class SpamDetectorGUI extends Component {
     // Instance variables for the Spam Detector, GUI Frame, Table, and Accuracy Label
     private final SpamDetector detector;
     private final JFrame frame;
     private final JTable table;
-    private final JLabel accuracyLabel;
+    private final JLabel status;
+    private int truePositives=0;
+    private int falsePositives=0;
+    private int falseNegatives=0;
+    private int trueNegatives=0;
+
+    private final ImageIcon Tick = resizeIcon(new ImageIcon(getClass().getResource("/icons/greentick.png")), 16, 16);
+    private final ImageIcon Cross = resizeIcon(new ImageIcon(getClass().getResource("/icons/crossicon.png")), 16, 16);
+
 
     // Constructor to initialize the GUI
     public SpamDetectorGUI() {
@@ -18,6 +28,20 @@ public class SpamDetectorGUI {
         frame = new JFrame("Spam Detector");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);
+
+        JMenuBar menu = new JMenuBar();
+        JMenu help = new JMenu("Help");
+        JMenu filem = new JMenu("File");
+        JMenuItem exit = new JMenuItem("Exit");
+        exit.addActionListener(e -> System.exit(0));
+        JMenuItem about = new JMenuItem("About");
+        about.addActionListener(e -> JOptionPane.showMessageDialog(this, "Spam Detector v1.0"));
+
+        filem.add(exit);
+        help.add(about);
+        menu.add(filem);
+        menu.add(help);
+        frame.setJMenuBar(menu);
 
         // Create a panel with a BorderLayout
         JPanel panel = new JPanel(new BorderLayout());
@@ -27,16 +51,29 @@ public class SpamDetectorGUI {
         selectDirButton.addActionListener(e -> selectDirectory());
 
         // Create a table to display file classification results
-        table = new JTable(new DefaultTableModel(new String[]{"File Name", "Actual Class", "Predicted Class", "Spam Probability"}, 0));
+        table = new JTable(new DefaultTableModel(new String[]{"File Name", "Actual Class", "Predicted Class", "Spam Probability","Correct"}, 0)) {
+            @Override
+            public TableCellRenderer getCellRenderer(int row, int col){
+                if(col== 4){
+                    return new ImageRenderer();
+                }
+                return super.getCellRenderer(row, col);
+
+            }
+        };
+
+
         JScrollPane scrollPane = new JScrollPane(table);
 
         // Label to display accuracy
-        accuracyLabel = new JLabel("Accuracy: ");
+        JPanel statusP = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        status = new JLabel("Ready");
+        statusP.add(status);
 
         // Add components to the panel
         panel.add(selectDirButton, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(accuracyLabel, BorderLayout.SOUTH);
+        panel.add(statusP, BorderLayout.SOUTH);
 
         // Add panel to the frame and make it visible
         frame.add(panel);
@@ -60,7 +97,11 @@ public class SpamDetectorGUI {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
 
-        int correct = 0, total = 0;
+        
+        truePositives=0;
+        falsePositives=0;
+        falseNegatives=0;
+        trueNegatives=0;
 
         // Iterate over both spam and ham categories in the test dataset
         for (File category : new File[]{new File(testDir, "spam"), new File(testDir, "ham")}) {
@@ -80,20 +121,58 @@ public class SpamDetectorGUI {
                     predictedClass = "Uncertain";
                 }
 
+                boolean isRight = predictedClass.equalsIgnoreCase(actualClass);
+                ImageIcon icon = isRight ? Tick : Cross;
+
                 // Add results to the table
-                model.addRow(new Object[]{file.getName(), actualClass, predictedClass, String.format("%.5f", prob)});
+                model.addRow(new Object[]{file.getName(), actualClass, predictedClass, String.format("%.5f", prob), icon});
 
                 // Count correct predictions
-                if ((predictedClass.equals("Spam") && actualClass.equals("spam")) ||
-                        (predictedClass.equals("Ham") && actualClass.equals("ham"))) {
-                    correct++;
+                if(predictedClass.equals("Spam") && actualClass.equals("spam")){
+                    truePositives++;
+                    
+                } else if (predictedClass.equals("Spam") && actualClass.equals("ham")) {
+                    falsePositives++;
+                    
+                }else if (predictedClass.equals("Ham") && actualClass.equals("spam")){
+                    falseNegatives++;
+                } else if (predictedClass.equals("Ham") && actualClass.equals("ham")) {
+                    trueNegatives++;
                 }
-                total++;
+
             }
         }
 
+        double precision = (double) truePositives/(truePositives + falsePositives);
+        double recall =(double) truePositives/(truePositives + falseNegatives);
+        double f1Score = 2 * (precision * recall)/ (precision + recall);
+        double accuracy = (double) (truePositives + trueNegatives)/ (truePositives+ trueNegatives + falsePositives+ falseNegatives);
+
         // Update accuracy label
-        accuracyLabel.setText("Accuracy: " + String.format("%.5f", (double) correct / total));
+        status.setText(String.format("Status: Accuracy = %.3f, Precision = %.3f, Recall = %.3f, F1 Score = %.3f", accuracy, precision, recall, f1Score));
+
+    }
+    private ImageIcon resizeIcon(ImageIcon icon , int width, int height ){
+        Image pic = icon.getImage();
+        Image resizedpic = pic.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+        return new ImageIcon(resizedpic);
+    }
+
+    private class ImageRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col){
+            if(value instanceof ImageIcon) {
+                setIcon((ImageIcon) value);
+                setText("");
+            }else{
+                setIcon(null);
+                setText( value != null ? value.toString() : "");
+
+            }
+            return this;
+
+        }
     }
 
     // Main method to run the GUI application

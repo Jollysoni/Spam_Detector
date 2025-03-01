@@ -149,7 +149,7 @@ public class SpamDetectorGUI extends Component {
         double accuracy = (double) (truePositives + trueNegatives)/ (truePositives+ trueNegatives + falsePositives+ falseNegatives);
 
         // Update accuracy label
-        status.setText(String.format("Status: Accuracy = %.3f, Precision = %.3f, Recall = %.3f, F1 Score = %.3f", accuracy, precision, recall, f1Score));
+        status.setText(String.format("Status: Accuracy = %.2f%%, Precision = %.2f%%, Recall = %.2f%%, F1 Score = %.2f%%", accuracy * 100, precision * 100, recall * 100, f1Score * 100));
 
     }
     private ImageIcon resizeIcon(ImageIcon icon , int width, int height ){

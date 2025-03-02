@@ -1,5 +1,5 @@
 # Assignment 1 - Spam Detector 
-Jolly Soni, Jia Dsouza, Devishi Soni  
+Jolly Soni, Jia Bernadette D Souza, Devishi Soni  
 CSCI2020U: Software Systems Development & Integration  
 
 ## Project Information
@@ -16,14 +16,31 @@ application include:
 
 Below are some screenshots of the application running:
 
-![Alt text]()
-
+<div align="center">
+  <img src="ss1.png" alt="Running Program" width="400" height="300"> <br>
+    <img src="ss2.png" alt="Running Program" width="400" height="300"> <br>
+    <img src="ss3.png" alt="Running Program" width="400" height="300">
+</div>
 
 ## Improvements 
 
-
+To increase the readability and make our application more user-friendly our group decided to add in a feature to our
+program to assist. Our group decided to add a column to our table that visually demonstrates whether the spam 
+detectors prediction was correct or incorrect. If correct there is a green check mark icon and if incorrect there is a 
+red cross icon. We decided to add this feature as we thought that it would be much faster and easier for the user to see
+whether the spam detector was successfully in categorizing the email as spam or ham.
 
 ## How To Run The Application 
+
+To successfully clone and run the application here are the steps the user must take:
+1. Ensure that the computer in which the application will be run on has the following installed: Java, Git, and an IDE (ex. IntelliJ, VSCode, etc.)
+2. Go onto the GitHub repository and copy its URL ([Link To Repository](https://github.com/OntarioTech-CS-program/w25-csci2020u-assignment01-a1-soni-soni-dsouza.git))
+3. Open up the terminal and clone the repository using the following git command: git clone <your-repository-url>
+4. Open the project in the IDE of your choice (may have to import as a Maven Project)
+5. Navigate to the file called ***SpamDetectorGUI.java*** (src/main/java/csci2020u/assignment01)and run that file.
+6. The user will be prompted to select their directory, they must navigate through their files and choose the folder named ***data***
+7. Give the application a couple seconds to complete the training and testing and then the output should be displayed!
+
 
 ## Resources
 

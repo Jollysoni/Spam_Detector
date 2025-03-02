@@ -37,7 +37,7 @@ To successfully clone and run the application here are the steps the user must t
 2. Go onto the GitHub repository and copy its URL ([Link To Repository](https://github.com/OntarioTech-CS-program/w25-csci2020u-assignment01-a1-soni-soni-dsouza.git))
 3. Open up the terminal and clone the repository using the following git command: git clone <your-repository-url>
 4. Open the project in the IDE of your choice (may have to import as a Maven Project)
-5. Navigate to the file called ***SpamDetectorGUI.java*** (src/main/java/csci2020u/assignment01)and run that file.
+5. Navigate to the file called ***SpamDetectorGUI.java*** (src/main/java/csci2020u/assignment01) and run that file.
 6. The user will be prompted to select their directory, they must navigate through their files and choose the folder named ***data***
 7. Give the application a couple seconds to complete the training and testing and then the output should be displayed!
 

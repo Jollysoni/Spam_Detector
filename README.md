@@ -130,11 +130,13 @@ Below are some screenshots of the application running:
 
 ## Improvements
 
-To increase the readability and make our application more user-friendly our group decided to add in a feature to our
-program to assist. Our group decided to add a column to our table that visually demonstrates whether the spam
-detectors prediction was correct or incorrect. If correct there is a green check mark icon and if incorrect there is a
-red cross icon. We decided to add this feature as we thought that it would be much faster and easier for the user to see
-whether the spam detector was successfully in categorizing the email as spam or ham.
+To increase the readability and make our application more user-friendly, our group decided to add features that enhance usability and improve the user experience.
+
+1) Visual Classification Indicators - We added a column to our table that visually demonstrates whether the spam detector's prediction was correct or incorrect. If correct, there is a green check mark icon; if incorrect, there is a red cross icon. This allows users to quickly see if the spam detector successfully categorized an email as spam or ham.
+
+2) Click to View Email Content - Users can now click on any email entry in the table to open and view the full email content in a pop-up window. This improvement makes it easier for users to verify the classification results by checking the actual email content.
+
+3)Potential Future Enhancements - Spam Filtering - Given more time, we would also add automated spam filtering, allowing the program to move detected spam emails to a separate folder automatically. This feature can be implemented in future updates to improve the usability of the spam detector.
 
 ## How To Run The Application
 

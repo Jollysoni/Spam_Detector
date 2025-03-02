@@ -16,7 +16,7 @@ application include:
 
 Below are some screenshots of the application running:
 
-![Alt text](src/main/java/csci2020u/assignment01/readMeFile/img.png)
+![Alt text]()
 
 
 ## Improvements 

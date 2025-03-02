@@ -17,9 +17,9 @@ application include:
 Below are some screenshots of the application running:
 
 <div align="center">
-  <img src="ss1.png" alt="Running Program" width="400" height="300"> <br>
-    <img src="ss2.png" alt="Running Program" width="400" height="300"> <br>
-    <img src="ss3.png" alt="Running Program" width="400" height="300">
+  <img src="../../../../../../ss1.png" alt="Running Program" width="400" height="300"> <br>
+    <img src="../../../../../../ss2.png" alt="Running Program" width="400" height="300"> <br>
+    <img src="../../../../../../ss3.png" alt="Running Program" width="400" height="300">
 </div>
 
 ## Improvements 

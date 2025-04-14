@@ -1,4 +1,4 @@
-# Assignment 1 - Spam Detector
+# Spam Detector
 Jolly Soni, Jia Bernadette D Souza, Devishi Soni  
 CSCI2020U: Software Systems Development & Integration
 

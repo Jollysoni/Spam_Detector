@@ -31,7 +31,7 @@ To increase the readability and make our application more user-friendly, our gro
 
 2) Click to View Email Content - Users can now click on any email entry in the table to open and view the full email content in a pop-up window. This improvement makes it easier for users to verify the classification results by checking the actual email content.
 
-3)Potential Future Enhancements - Spam Filtering - Given more time, we would also add automated spam filtering, allowing the program to move detected spam emails to a separate folder automatically. This feature can be implemented in future updates to improve the usability of the spam detector.
+3) Potential Future Enhancements - Spam Filtering - Given more time, we would also add automated spam filtering, allowing the program to move detected spam emails to a separate folder automatically. This feature can be implemented in future updates to improve the usability of the spam detector.
 
 ## How To Run The Application
 
